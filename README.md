@@ -25,6 +25,7 @@ conda activate sphinx-env
 conda install python
 conda install anaconda::sphinx
 conda install conda-forge::sphinx_rtd_theme 
+conda install conda-forge::sphinxcontrib-bibtex
 ~~~
 
 To view the documentation locally, build the html using the following: 

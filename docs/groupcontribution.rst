@@ -35,7 +35,7 @@ Table of GCM properties
    ====================================  =====================  ===========================================  ====================  ===========================================================
    Property                              Units                  Group Contributions                          Units                 Description
    ====================================  =====================  ===========================================  ====================  ===========================================================
-   :math:`M_{w,i}`                       kg/mol                 :math:`m_{w1k}`, :math:`m_{w2j}`             g/mol                 Molecular weight.
+   :math:`M_{w,i}`                       kg/mol                 :math:`m_{w1k}`                              g/mol                 Molecular weight.
    :math:`T_{c,i}`                       K                      :math:`t_{c1k}`, :math:`t_{c2j}`             1                     Critical temperature\ :footcite:p:`constantinou_new_1994`.
    :math:`p_{c,i}`                       Pa                     :math:`p_{c1k}`, :math:`p_{c2j}`             bar\ :sup:`-0.5`      Critical pressure\ :footcite:p:`constantinou_new_1994`.
    :math:`V_{c,i}`                       m\ :sup:`3`\ /mol      :math:`v_{c1k}`, :math:`v_{c2j}`             m\ :sup:`3`\ /kmol    Critical volume\ :footcite:p:`constantinou_new_1994`.
@@ -44,7 +44,7 @@ Table of GCM properties
    :math:`\Delta H_{f,i}`                J/mol                  :math:`h_{f1k}`, :math:`h_{f2j}`             kJ/mol                Enthalpy of formation at 298 K\ :footcite:p:`constantinou_new_1994`.
    :math:`\Delta G_{f,i}`                J/mol                  :math:`g_{f1k}`, :math:`g_{f2j}`             kJ/mol                Standard Gibbs free energy at 298 K\ :footcite:p:`constantinou_new_1994`.
    :math:`\Delta H_{v,\textit{stp},i}`   J/mol                  :math:`h_{v1k}`, :math:`h_{v2j}`             kJ/mol                Enthalpy of vaporization at 298 K\ :footcite:p:`constantinou_new_1994`.
-   :math:`\omega_i`                      1                      :math:`\omega_{1k}`, :math:`\omega_{2j}`     1                     Accentric factor\ :footcite:p:`constantinou_estimation_1995`.
+   :math:`\omega_i`                      1                      :math:`\omega_{1k}`, :math:`\omega_{2j}`     1                     Acentric factor\ :footcite:p:`constantinou_estimation_1995`.
    :math:`V_{m,\textit{stp},i}`          m\ :sup:`3`\ /mol      :math:`v_{m1k}`, :math:`v_{m2j}`             m\ :sup:`3`\ /kmol    Liquid molar volume at 298 K\ :footcite:p:`constantinou_estimation_1995`. 
    :math:`C_{p,\textit{stp},i}`          J/mol/K                :math:`C_{pA1_k}`, :math:`C_{pA2_k}`,...     J/mol/K               Specific heat capacity\ :footcite:p:`nielsen_molecular_1998,poling_properties_2001`.
    ====================================  =====================  ===========================================  ====================  ===========================================================
@@ -59,7 +59,7 @@ The properties of each compound in a mixture can be calculated as the sum of con
 .. math::
 
    \begin{align*}
-    M_{w,i} &= \bigg[\sum_{k = 1}^{N_{g_1}}\mathbf{N}_{ik}m_{w1k} + W \sum_{j = 1}^{N_{g_2}}\mathbf{M}_{ij} m_{w2k} \bigg] \times 10^{-3}, \\
+    M_{w,i} &= \bigg[\sum_{k = 1}^{N_{g_1}}\mathbf{N}_{ik}m_{w1k} \bigg] \times 10^{-3}, \\
     T_{c,i} &= 181.28 \ln  \bigg[ \sum_{k=1}^{N_{g_1}} \mathbf{N}_{ik} t_{c1k} + W \sum_{j=1}^{N_{g_2}}         \mathbf{M}_{ij} t_{c2j} \bigg],\\
     p_{c,i} &= \Bigg( \bigg[  \sum_{k=1}^{N_{g_1}} \mathbf{N}_{ik} p_{c1k} + W \sum_{j=1}^{N_{g_2}} \mathbf{M}_{ij}     p_{c2j} + 0.10022\bigg]^{-2}  + 1.3705\Bigg)\times 10^{5}, \label{eq:gcm-pc}\\
     V_{c,i} &= \Bigg( \bigg[ \sum_{k=1}^{N_{g_1}} \mathbf{N}_{ik} v_{c1k} + W \sum_{j=1}^{N_{g_2}} \mathbf{M}_{ij}      v_{c2j} \bigg] -0.00435 \Bigg)\times 10^{-3}, \\
@@ -295,13 +295,7 @@ The Arrhenius rule is:
 
    \ln \nu_{Arr} = \sum_{i=1}^{N_c} X_i\ln\nu_i .
 
-.. figure:: /figures/viscosity-methods-posf10325.png
-   :width: 400pt
-   :align: center
 
-   Viscosity of posf10325 (Jet A) versus temperature using Kendall-Monrow and 
-   Arrhenius mixing rules. Data collected from a sample of GE Jet A fuel by the 
-   Fuels and Combustion Science group at the National Renewable Energy Lab.
 
 Mixture vapor pressure
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -331,6 +325,11 @@ Mixture property validation
 Mixture properties of decane, dodecane, and heptane.  Data from NIST Chemistry WebBook.
 
 
+.. image:: /figures/mixtureProps-posf10325.png
+   :width: 600pt
+   :align: center
+
+Density (left) and vapor pressure (right) for POSF-10325 against data from the Air Force Research Laboratory\ :footcite:p:`edwards_jet_2020`.
 
 References
 ----------
