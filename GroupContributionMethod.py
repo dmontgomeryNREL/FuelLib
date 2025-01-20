@@ -450,7 +450,7 @@ class groupContribution:
         Vmi = self.molar_liquid_vol(T)  # Molar volume of each component (m^3/mol)
 
         # Calculate density (kg/m^3)
-        rho = (MW @ Yi) / (Vmi @ Yi)
+        rho = Yi @ (MW/Vmi)
 
         return rho
 

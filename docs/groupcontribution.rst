@@ -264,15 +264,7 @@ The mixture's density is calculated as:
 
 .. math::
    
-   \rho = \frac{M_w}{V_m},
-
-where the molecular weight and molar volume of the mixture are given by:
-
-.. math::
-
-   M_w = \sum_{i=1}^{N_c} Y_i  M_{w,i} 
-   \hspace{2mm} \text{ and } \hspace{2mm}
-   V_m = \sum_{i = 1}^{N_c} Y_i  V_{m,i}.
+   \rho = \sum_{i=1}^{N_c}Y_i\frac{M_{w,i}}{V_{m,i}}.
 
 
 Mixture kinematic viscosity
