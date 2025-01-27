@@ -68,7 +68,7 @@ class groupContribution:
         mixture. Reads GCM table and mixture data from files.
         
         Parameters:
-        name (str): Name of the mixture to initialize data for.
+        name (str): Name of the fuel and associated GCxGC and decomposition data.
         W (int): Determines if first-order only approximation (i.e. W = 0) 
         """
 

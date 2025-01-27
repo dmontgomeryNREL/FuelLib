@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 import GroupContributionMethod as gcm
+import re
 
 # -----------------------------------------------------------------------------
 # Calculate mixture properties from the group contribution properties
@@ -10,7 +11,8 @@ import GroupContributionMethod as gcm
 
 # Fuel for GCM and data for validation (see fuelData/propertiesData for options)
 # fuel_name = 'decane', 'dodecane', 'heptane', 'posf10264', 'posf10289', 'posf10325'
-fuel_name = 'decane'
+fuel_name = 'posf10289'
+decomp_name = fuel_name
 
 # droplet specs
 drop = {} 
@@ -21,7 +23,7 @@ def drop_mass(fuel,Yi,T):
     return drop['V_0'] / (fuel.molar_liquid_vol(T) @ Yi) * Yi * fuel.MW # (kg)
 
 # Get the fuel properties based on the GCM
-fuel = gcm.groupContribution(fuel_name)
+fuel = gcm.groupContribution(fuel_name, decomp_name)
 
 # initial liquid mass fractions
 Y_li = fuel.Y_0
@@ -101,6 +103,7 @@ plt.xlim([min(T_rho_data), max(T_rho_data)])
 plt.xticks(fontsize=ticksize)
 plt.yticks(fontsize=ticksize)
 plt.legend(fontsize=fsize)
+plt.tight_layout()
 
 # Plot mixture vapor pressure vs. Temp
 plt.figure(figsize=(10,7.2))
@@ -114,7 +117,7 @@ plt.ylim([0, max(pv_data)])
 plt.xticks(fontsize=ticksize)
 plt.yticks(fontsize=ticksize)
 plt.legend(fontsize=fsize)
-
+plt.tight_layout()
 
 # Plot mixture viscosity vs. Temp
 if "posf" not in fuel_name.lower():
@@ -128,5 +131,5 @@ if "posf" not in fuel_name.lower():
     plt.xticks(fontsize=ticksize)
     plt.yticks(fontsize=ticksize)
     plt.legend(fontsize=fsize)
-
+plt.tight_layout()
 plt.show()
