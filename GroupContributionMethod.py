@@ -461,7 +461,7 @@ class groupContribution:
         Parameters:
         mass (np.ndarray): Mass of each compound of mixture (shape: num_compounds,).
         T (float): Temperature in Kelvin.
-        correlation (str, optional): Mixing model "Kendall-Monroe", "Arrhenius". 
+        correlation (str, optional): Mixing model "Kendall-Monroe" or "Arrhenius". 
 
         Returns:
         float: Mixture viscosity in mm^2/s.

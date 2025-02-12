@@ -1,4 +1,5 @@
 .DS_Store
 */.DS_Store
-*.*.dat
+*.dat
 __pycache__*
+_build*
