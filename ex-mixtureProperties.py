@@ -3,133 +3,120 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 import GroupContributionMethod as gcm
-import re
 
 # -----------------------------------------------------------------------------
 # Calculate mixture properties from the group contribution properties
 # -----------------------------------------------------------------------------
 
 # Fuel for GCM and data for validation (see fuelData/propertiesData for options)
-# fuel_name = 'decane', 'dodecane', 'heptane', 'posf10264', 'posf10289', 'posf10325'
-fuel_name = 'posf10289'
-decomp_name = fuel_name
+# Options: 'decane', 'dodecane', 'heptane', 'posf10264', 'posf10289', 'posf10325'
+fuel_name = 'posf10325'
 
-# droplet specs
-drop = {} 
-drop['d_0'] = 100*1e-6 	# initial droplet diameter (m), note: size doesn't matter
-drop['r_0'] = drop['d_0']/2.0 # initial droplet radius (m)
-drop['V_0'] = 4.0 / 3.0 * np.pi * drop['r_0'] ** 3 # initial droplet volume
-def drop_mass(fuel,Yi,T):
-    return drop['V_0'] / (fuel.molar_liquid_vol(T) @ Yi) * Yi * fuel.MW # (kg)
+# Plotting controls
+fsize = 14 
+ticksize = 12
+line_thickness = 2
+marker_size = 50
 
-# Get the fuel properties based on the GCM
-fuel = gcm.groupContribution(fuel_name, decomp_name)
+def plot_fuel_properties(fuel_name):
+    # Initialize droplet specifications
+    drop = {} 
+    drop['d_0'] = 100 * 1e-6  # initial droplet diameter (m)
+    drop['r_0'] = drop['d_0'] / 2.0  # initial droplet radius (m)
+    drop['V_0'] = 4.0 / 3.0 * np.pi * drop['r_0'] ** 3  # initial droplet volume
 
-# initial liquid mass fractions
-Y_li = fuel.Y_0
+    def drop_mass(fuel, Yi, T):
+        return drop['V_0'] / (fuel.molar_liquid_vol(T) @ Yi) * Yi * fuel.MW  # (kg)
 
-# Get data for validation
-fuel_to_data = {
-    'heptane': ('heptane-NIST.csv', 'NIST Data'),
-    'decane': ('decane-NIST.csv', 'NIST Data'),
-    'dodecane': ('dodecane-NIST.csv', 'NIST Data'),
-    'posf10264': ('posf10264.csv', 'Edwards Data'),
-    'posf10289': ('posf10289.csv', 'Edwards Data'),
-    'posf10325': ('posf10325.csv', 'Edwards Data'),
-    'a-2_posf10325_Ed': ('a-2_posf10325_Ed.csv', 'Edwards Data')
-}
-data_file, data_source = fuel_to_data.get(fuel_name)
-dataPath = os.path.join(fuel.fuelDataDir,"propertiesData")
-data = pd.read_csv(os.path.join(dataPath,data_file),skiprows=[1])
+    # Get the fuel properties based on the GCM
+    fuel = gcm.groupContribution(fuel_name)
 
-# Seperate properties and associated temperatures from data
-T_rho_data = data.Temperature[data.Density.notna()]
-rho_data = data.Density.dropna()
-T_pv_data = data.Temperature[data.VaporPressure.notna()]
-pv_data = data.VaporPressure.dropna()
-if "posf" not in fuel_name.lower():
+    # Initial liquid mass fractions
+    Y_li = fuel.Y_0
+
+    # Mapping for fuel name to data and legend name
+    fuel_to_data = {
+        'heptane': ('heptane-NIST.csv', 'NIST Data'),
+        'decane':  ('decane-NIST.csv', 'NIST Data'),
+        'dodecane': ('dodecane-NIST.csv', 'NIST Data'),
+        'posf10264': ('posf10264.csv', 'Edwards et al. AFRL'),
+        'posf10289': ('posf10289.csv', 'Edwards et al. AFRL'),
+        'posf10325': ('posf10325.csv', 'Edwards et al. AFRL')
+    }
+    data_file, data_source = fuel_to_data.get(fuel_name)
+
+    # Load the experimental data
+    dataPath = os.path.join(fuel.fuelDataDir, "propertiesData")
+    data = pd.read_csv(os.path.join(dataPath, data_file), skiprows=[1])
+
+    # Separate properties and temperatures from data
     T_nu_data = data.Temperature[data.Viscosity.notna()]
     nu_data = data.Viscosity.dropna()
+    T_rho_data = data.Temperature[data.Density.notna()]
+    rho_data = data.Density.dropna()
+    T_pv_data = data.Temperature[data.VaporPressure.notna()]
+    pv_data = data.VaporPressure.dropna()
 
-# Vectors for temperature (convert from C to K)
-T_rho = gcm.C2K(np.linspace(min(T_rho_data),max(T_rho_data),100))
-T_pv = gcm.C2K(np.linspace(min(T_pv_data),max(T_pv_data),100))
-if "posf" not in fuel_name.lower():
-    T_nu = gcm.C2K(np.linspace(min(T_nu_data),max(T_nu_data),100))
-
-# Vectors for density, viscosity and vapor pressure
-rho = np.zeros_like(T_rho)
-pv = np.zeros_like(T_pv)
-if "posf" not in fuel_name.lower():
+    # Generate temperature vectors and initialize GCM property vectors
+    T_rho = gcm.C2K(np.linspace(min(T_rho_data), max(T_rho_data), 100))
+    rho = np.zeros_like(T_rho)
+    T_nu = gcm.C2K(np.linspace(min(T_nu_data), max(T_nu_data), 100))
     nu = np.zeros_like(T_nu)
+    T_pv = gcm.C2K(np.linspace(min(T_pv_data), max(T_pv_data), 100))
+    pv = np.zeros_like(T_pv)
 
-for i in range(0,len(T_rho)): 
-    # Mixture density (returns rho in kg/m^3)
-    rho[i] = fuel.mixture_density(fuel.Y_0,T_rho[i])
-    # Convert density to CGS (g/cm^3)
-    rho[i] *= 1.0e-03 
-
-for i in range(0,len(T_pv)): 
-    # Mass of the droplet at current temp
-    mass = drop_mass(fuel, Y_li, T_pv[i])
-    # Mixture vapor pressure (returns pv in Pa)
-    pv[i] = fuel.mixture_vapor_pressure(mass,T_pv[i])
-    # Convert vapor pressure to kPa
-    pv[i] *= 1.0e-03
-
-if "posf" not in fuel_name.lower():
-    for i in range(0,len(T_nu)): 
-        # Mass of the droplet at current temp
+    # Calculate GCM properties for a range of temperatures
+    for i in range(len(T_rho)): 
+        rho[i] = fuel.mixture_density(fuel.Y_0, T_rho[i]) # kg/m^3
+        rho[i] *= 1e-3 # Convert to g/cm^3
+    for i in range(len(T_nu)): 
         mass = drop_mass(fuel, Y_li, T_nu[i])
-        # Mixture viscosity (returns nu in m^2/s)
-        nu[i] = fuel.mixture_kinematic_viscosity(mass, T_nu[i])
-        # Convert viscosity to mm^2/s
-        nu[i] *= 1.0e+06
+        nu[i] = fuel.mixture_kinematic_viscosity(mass, T_nu[i]) # m^2/s
+        nu[i] *= 1e6  # Convert to mm^2/s
 
-# Plotting parameters
-fsize = 24
-ticksize = 22
-line_thickness = 4
-marker_size = 75
+    for i in range(len(T_pv)): 
+        mass = drop_mass(fuel, Y_li, T_pv[i])
+        pv[i] = fuel.mixture_vapor_pressure(mass, T_pv[i]) # Pa
+        pv[i] *= 1e-3  # Convert to kPa
 
-# Plot mixture density vs. Temp
-plt.figure(figsize=(10,7.2))
-plt.plot(gcm.K2C(T_rho), rho, '-',label='Model Prediction', linewidth=line_thickness)
-plt.scatter(T_rho_data, rho_data, 
-            label=data_source, facecolors='black', s=marker_size)
-plt.xlabel('Temperature ($^\circ$C)', fontsize=fsize)
-plt.ylabel('Density (g/cm$^3$)', fontsize=fsize)
-plt.xlim([min(T_rho_data), max(T_rho_data)])
-plt.xticks(fontsize=ticksize)
-plt.yticks(fontsize=ticksize)
-plt.legend(fontsize=fsize)
-plt.tight_layout()
+    # Create subplots
+    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    if "posf" in fuel_name:
+        title_name = fuel_name.upper()
+    else:
+        title_name = fuel_name.capitalize()
+    
+    fig.suptitle(f"Fuel: {title_name}", fontsize=fsize + 2)
 
-# Plot mixture vapor pressure vs. Temp
-plt.figure(figsize=(10,7.2))
-plt.plot(gcm.K2C(T_pv), pv, '-',label='Model Prediction', linewidth=line_thickness)
-plt.scatter(T_pv_data, pv_data, 
-            label=data_source, facecolors='black', s=marker_size)
-plt.xlabel('Temperature ($^\circ$C)', fontsize=fsize)
-plt.ylabel('Vapor Pressure (kPa)', fontsize=fsize)
-plt.xlim([min(T_pv_data), max(T_pv_data)])
-plt.ylim([0, max(pv_data)])
-plt.xticks(fontsize=ticksize)
-plt.yticks(fontsize=ticksize)
-plt.legend(fontsize=fsize)
-plt.tight_layout()
+    # Density
+    axes[0].plot(gcm.K2C(T_rho), rho, '-', label='Model Prediction', linewidth=line_thickness)
+    axes[0].scatter(T_rho_data, rho_data, label=data_source, facecolors='black', s=marker_size)
+    axes[0].set_xlim([min(T_rho_data), max(T_rho_data)])
+    axes[0].set_xlabel('Temperature (°C)', fontsize=fsize)
+    axes[0].set_ylabel('Density (g/cm³)', fontsize=fsize)
+    axes[0].tick_params(axis='both', labelsize=ticksize)
 
-# Plot mixture viscosity vs. Temp
-if "posf" not in fuel_name.lower():
-    plt.figure(figsize=(10,7.2))
-    plt.plot(gcm.K2C(T_nu), nu, '-',label='Model Prediction', linewidth=line_thickness)
-    plt.scatter(T_nu_data, nu_data, 
-                label=data_source, facecolors='black', s=marker_size)
-    plt.xlabel('Temperature (C)', fontsize=fsize)
-    plt.ylabel('Viscosity (mm$^2$/s)', fontsize=fsize)
-    plt.xlim([min(T_nu_data), max(T_nu_data)])
-    plt.xticks(fontsize=ticksize)
-    plt.yticks(fontsize=ticksize)
-    plt.legend(fontsize=fsize)
-plt.tight_layout()
-plt.show()
+    # Vapor Pressure
+    axes[1].plot(gcm.K2C(T_pv), pv, '-', label='Model Prediction', linewidth=line_thickness)
+    axes[1].scatter(T_pv_data, pv_data, label=data_source, facecolors='black', s=marker_size)
+    axes[1].set_xlim([min(T_pv_data), max(T_pv_data)])
+    axes[1].set_ylim([0, max(pv_data)])
+    axes[1].set_xlabel('Temperature (°C)', fontsize=fsize)
+    axes[1].set_ylabel('Vapor Pressure (kPa)', fontsize=fsize)
+    axes[1].tick_params(axis='both', labelsize=ticksize)
+    
+    # Viscosity
+    axes[2].plot(gcm.K2C(T_nu), nu, '-', label='Model Prediction', linewidth=line_thickness)
+    axes[2].scatter(T_nu_data, nu_data, label=data_source, facecolors='black', s=marker_size)
+    axes[2].set_xlim([min(T_nu_data), max(T_nu_data)])
+    axes[2].set_xlabel('Temperature (°C)', fontsize=fsize)
+    axes[2].set_ylabel('Viscosity (mm²/s)', fontsize=fsize)
+    axes[2].legend(fontsize=10)
+    axes[2].tick_params(axis='both', labelsize=ticksize)
+
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    plt.show()
+
+# Generate the plots for a given fuel
+plot_fuel_properties(fuel_name)
+
