@@ -321,7 +321,7 @@ Mixture properties of decane, dodecane, and heptane.  Data from NIST Chemistry W
    :width: 600pt
    :align: center
 
-Density (left) and vapor pressure (right) for POSF-10325 against data from the Air Force Research Laboratory\ :footcite:p:`edwards_jet_2020`.
+Density, vapor pressure and viscosity predictions for POSF10325 against data from the Air Force Research Laboratory\ :footcite:p:`edwards_jet_2020`.
 
 References
 ----------
