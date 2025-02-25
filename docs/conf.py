@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'FuelLib'
-copyright = '2024, David Montgomery'
-author = 'David Montgomery'
+copyright = ''
+author = ''
 
 # The full version, including alpha/beta/rc tags
 release = '2024'
