@@ -1,5 +1,5 @@
-FuelLib
-=======
+Properties and Model Equations
+==============================
 
 The **Fuel Library** for advanced research on evaporation **(FuelLib)** utilizes
 the group contribution method (GCM), as developed by Constantinou and 
